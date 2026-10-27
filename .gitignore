@@ -1,0 +1,22 @@
+# Build / Xcode
+**/DerivedData/
+**/*.xcuserdata/
+**/xcuserdata/
+**/.DS_Store
+**/build/
+**/*.ipa
+**/*.dSYM/
+
+# Huge release zip with embedded darwin node (download upstream instead)
+dist/*.zip
+dist/**/node
+**/Contents/Resources/node
+**/Contents/Resources/node-*
+
+# Node
+**/node_modules/
+npm-debug.log*
+
+# Local runtime
+.sketch-lan-mirror/
+*.log

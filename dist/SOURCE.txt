@@ -1,0 +1,6 @@
+LAN-v0.5.3.zip
+  URL: https://github.com/xuezx1999/sketch-lan-mirror/releases/download/v0.5.3/LAN-v0.5.3.zip
+  Downloaded: 2026-10-27 (Asia/Shanghai)
+  SHA256: bf47376576e59b84c5a8fa0b7dda566b9571b907994fc438f83f289ab7add36e
+  Size: 75629172 bytes
+  Contents: 览LAN.sketchplugin (plugin + embedded server + fat darwin node)

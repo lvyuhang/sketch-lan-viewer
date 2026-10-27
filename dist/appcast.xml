@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>LAN</title>
+    <link>https://github.com/xuezx1999/sketch-lan-mirror/releases/latest/download/appcast.xml</link>
+    <description>LAN — Sketch 画板实时镜像到 iPhone</description>
+    <item>
+      <title>Version 0.5.3</title>
+      <pubDate>Mon, 14 Sep 2026 03:29:05 +0000</pubDate>
+      <enclosure url="https://github.com/xuezx1999/sketch-lan-mirror/releases/download/v0.5.3/LAN-v0.5.3.zip" sparkle:version="0.5.3" length="75629172" type="application/zip"/>
+    </item>
+  </channel>
+</rss>

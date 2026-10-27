@@ -1,0 +1,285 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E2FDD2F0AA984C60A2207F0E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD14137AEB1B40999A076859 /* main.m */; };
+		6A27685A96734FDF9BF6D42A /* PTChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3E96FC35964E4E965A9B6B /* PTChannel.m */; };
+		7D57347158234A4DAB0B5663 /* PTProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = F210F9E91C4B4C1798714493 /* PTProtocol.m */; };
+		BE0AD47275B64359890F448C /* PTUSBHub.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E11AC67F41D4B29A52B12BD /* PTUSBHub.m */; };
+		0827BBEBE0F742179C097844 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C05D9E532FC044D481EB2C89 /* GCDAsyncSocket.m */; };
+		CC8761362E7B4837BD3ADDB1 /* FKPortForwardingClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 122699E6DE614BBC8DF1567D /* FKPortForwardingClient.m */; };
+		B983D9DFC70940FD90F0A1C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE512643A074D98A0D4B1F3 /* Foundation.framework */; };
+		61B73C836E5E4F6B9FBE3E35 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7E0C70E6B544688AAEE6468 /* CFNetwork.framework */; };
+		43C86FD4154048C781C06DB0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8A2128F40274EB7A7537217 /* Security.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		DD14137AEB1B40999A076859 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3B3E96FC35964E4E965A9B6B /* PTChannel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTChannel.m; sourceTree = "<group>"; };
+		F210F9E91C4B4C1798714493 /* PTProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTProtocol.m; sourceTree = "<group>"; };
+		2E11AC67F41D4B29A52B12BD /* PTUSBHub.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTUSBHub.m; sourceTree = "<group>"; };
+		35562DB784B74F12ADFAC4D2 /* PTChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTChannel.h; sourceTree = "<group>"; };
+		19075A525D1046A0A50F735A /* PTDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTDefines.h; sourceTree = "<group>"; };
+		94A11A8B3328496B93EFBE34 /* PTPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTPrivate.h; sourceTree = "<group>"; };
+		62ABCEBD9D884D28A45D912C /* PTProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTProtocol.h; sourceTree = "<group>"; };
+		DAC8C38BB7604348B39259EC /* PTUSBHub.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTUSBHub.h; sourceTree = "<group>"; };
+		CAB5FC0B526A43CA89C89E3A /* Peertalk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Peertalk.h; sourceTree = "<group>"; };
+		C05D9E532FC044D481EB2C89 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		CEF12DB2382845DFBAFCCBDF /* GCDAsyncSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		122699E6DE614BBC8DF1567D /* FKPortForwardingClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FKPortForwardingClient.m; sourceTree = "<group>"; };
+		71171E9842AE4B4EA685F882 /* FKPortForwardingClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKPortForwardingClient.h; sourceTree = "<group>"; };
+		AC8C1B4667C84056B2D79F7E /* FKPortForwardingCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKPortForwardingCommon.h; sourceTree = "<group>"; };
+		7E8BDF4EB56E4FC38D12DC93 /* USBPorts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USBPorts.h; sourceTree = "<group>"; };
+		CEE512643A074D98A0D4B1F3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D7E0C70E6B544688AAEE6468 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		E8A2128F40274EB7A7537217 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		4BE65F3B5A4A43E3A2CE1BA8 /* LanUSBHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LanUSBHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		69B638DBA80C4BAEA6D3C254 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B983D9DFC70940FD90F0A1C2 /* Foundation.framework in Frameworks */,
+				61B73C836E5E4F6B9FBE3E35 /* CFNetwork.framework in Frameworks */,
+				43C86FD4154048C781C06DB0 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4D4727A30A564D74B22868EB = {
+			isa = PBXGroup;
+			children = (
+				7282E5F7B45348C1990AB6D8 /* LanUSBHelper */,
+				624AB08DD88F4329A11CF5B4 /* Vendor */,
+				146993621230466693CB5D95 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7282E5F7B45348C1990AB6D8 /* LanUSBHelper */ = {
+			isa = PBXGroup;
+			children = (
+				DD14137AEB1B40999A076859 /* main.m */,
+			);
+			path = LanUSBHelper;
+			sourceTree = "<group>";
+		};
+		624AB08DD88F4329A11CF5B4 /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				1A631F4765854435A1C02813 /* peertalk */,
+				E2C77CE4CD1246F583CF50F4 /* CocoaAsyncSocket */,
+				47322A98CBBD46F699E593E3 /* FKPortForwarding */,
+			);
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		1A631F4765854435A1C02813 /* peertalk */ = {
+			isa = PBXGroup;
+			children = (
+				3B3E96FC35964E4E965A9B6B /* PTChannel.m */,
+				F210F9E91C4B4C1798714493 /* PTProtocol.m */,
+				2E11AC67F41D4B29A52B12BD /* PTUSBHub.m */,
+				35562DB784B74F12ADFAC4D2 /* PTChannel.h */,
+				19075A525D1046A0A50F735A /* PTDefines.h */,
+				94A11A8B3328496B93EFBE34 /* PTPrivate.h */,
+				62ABCEBD9D884D28A45D912C /* PTProtocol.h */,
+				DAC8C38BB7604348B39259EC /* PTUSBHub.h */,
+				CAB5FC0B526A43CA89C89E3A /* Peertalk.h */,
+			);
+			path = peertalk;
+			sourceTree = "<group>";
+		};
+		E2C77CE4CD1246F583CF50F4 /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				C05D9E532FC044D481EB2C89 /* GCDAsyncSocket.m */,
+				CEF12DB2382845DFBAFCCBDF /* GCDAsyncSocket.h */,
+			);
+			path = CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
+		47322A98CBBD46F699E593E3 /* FKPortForwarding */ = {
+			isa = PBXGroup;
+			children = (
+				122699E6DE614BBC8DF1567D /* FKPortForwardingClient.m */,
+				71171E9842AE4B4EA685F882 /* FKPortForwardingClient.h */,
+				AC8C1B4667C84056B2D79F7E /* FKPortForwardingCommon.h */,
+				7E8BDF4EB56E4FC38D12DC93 /* USBPorts.h */,
+			);
+			path = FKPortForwarding;
+			sourceTree = "<group>";
+		};
+		146993621230466693CB5D95 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4BE65F3B5A4A43E3A2CE1BA8 /* LanUSBHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		63520CCEF0BE4E47A34DB92A /* LanUSBHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAF8B930C484441FBC75782A /* Build configuration list for PBXNativeTarget "LanUSBHelper" */;
+			buildPhases = (
+				4C2D87D3DB7E4841BE34C87F /* Sources */,
+				69B638DBA80C4BAEA6D3C254 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LanUSBHelper;
+			productName = LanUSBHelper;
+			productReference = 4BE65F3B5A4A43E3A2CE1BA8 /* LanUSBHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3F665334684D4CCDA09AFB97 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					63520CCEF0BE4E47A34DB92A = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = D2D08A7D5DE04D2E805EC3B0 /* Build configuration list for PBXProject "LanUSBHelper" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4D4727A30A564D74B22868EB;
+			productRefGroup = 146993621230466693CB5D95 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				63520CCEF0BE4E47A34DB92A /* LanUSBHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C2D87D3DB7E4841BE34C87F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2FDD2F0AA984C60A2207F0E /* main.m in Sources */,
+				6A27685A96734FDF9BF6D42A /* PTChannel.m in Sources */,
+				7D57347158234A4DAB0B5663 /* PTProtocol.m in Sources */,
+				BE0AD47275B64359890F448C /* PTUSBHub.m in Sources */,
+				0827BBEBE0F742179C097844 /* GCDAsyncSocket.m in Sources */,
+				CC8761362E7B4837BD3ADDB1 /* FKPortForwardingClient.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2AB20C0DA7EE44158B368B67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/FKPortForwarding",
+					"$(SRCROOT)/LanUSBHelper",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		795F50861E7C496FB6A44A42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/FKPortForwarding",
+					"$(SRCROOT)/LanUSBHelper",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1E0EAFC973EB469992E0308F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanusbhelper;
+				PRODUCT_NAME = LanUSBHelper;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		7A95ACE6C9404E4EBE3FD66A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanusbhelper;
+				PRODUCT_NAME = LanUSBHelper;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D2D08A7D5DE04D2E805EC3B0 /* Build configuration list for PBXProject "LanUSBHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2AB20C0DA7EE44158B368B67 /* Debug */,
+				795F50861E7C496FB6A44A42 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAF8B930C484441FBC75782A /* Build configuration list for PBXNativeTarget "LanUSBHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E0EAFC973EB469992E0308F /* Debug */,
+				7A95ACE6C9404E4EBE3FD66A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3F665334684D4CCDA09AFB97 /* Project object */;
+}

@@ -1,0 +1,382 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06482ABED99D44139B3B9032 /* LanViewerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B40E3A8DD9D4B9AAEDB2384 /* LanViewerApp.swift */; };
+		723D052AA200420A9000D6B5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D5C81D0ED940778F73E8A5 /* RootView.swift */; };
+		E6D107B689784A0F87C7872B /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90891877340444C981B459C /* ConnectView.swift */; };
+		6EBFE5022FF946DA933F7D65 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABA5820378B4093A5C26866 /* PreviewView.swift */; };
+		9F9D7DFD24724C498F95DF5F /* MirrorClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA58BFEDD882485E90166190 /* MirrorClient.swift */; };
+		7CAAA20B32C042C28269F2C9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF4831F97D2C4C43A508C8BB /* Models.swift */; };
+		81AD00877D6A4F0C9876FE3E /* USBTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8884A4EAD21C4A5589CEC379 /* USBTunnel.swift */; };
+		5ADEF61EC7AB499AB1E81F2A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F9B7B4CE354794AF5AABC4 /* Assets.xcassets */; };
+		D5733F0DC7B44662ADD73206 /* PTChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 33F4A3A96AC54E93A0B58624 /* PTChannel.m */; };
+		E7466D933B4E4D72AC964F7F /* PTProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 75C077D5080C46098BED1FEA /* PTProtocol.m */; };
+		091E7B2A12FD4B22BD896485 /* PTUSBHub.m in Sources */ = {isa = PBXBuildFile; fileRef = B4A0773B66D445CCB35CA5F3 /* PTUSBHub.m */; };
+		C8A2A708AD2A41EA9D4F90DE /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC9B4887D22439781D11DDA /* GCDAsyncSocket.m */; };
+		79BCE77247034E839B9DA675 /* FKPortForwardingServer.m in Sources */ = {isa = PBXBuildFile; fileRef = DE032EC06B994E51A057F395 /* FKPortForwardingServer.m */; };
+		7E3C0038BCCE4773ACD75237 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 361A621E6C40453095162C70 /* Foundation.framework */; };
+		26486C8A75AA464DAAD6CEA2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C9C2F3A4DF34A1DB1EF88B1 /* UIKit.framework */; };
+		EA5585B75A4245A694211FE8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BBAFB28FE46BD8A9854B2 /* CFNetwork.framework */; };
+		77E1AB8B51A74972BB4B59F0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64A3510C40A14C39B3BF8318 /* Security.framework */; };
+		9E6542545E3D4016A3F72092 /* USBTunnelHost.m in Sources */ = {isa = PBXBuildFile; fileRef = B49BE32CB7AB40B0B06F77BC /* USBTunnelHost.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2B40E3A8DD9D4B9AAEDB2384 /* LanViewerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanViewerApp.swift; sourceTree = "<group>"; };
+		E6D5C81D0ED940778F73E8A5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		E90891877340444C981B459C /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
+		4ABA5820378B4093A5C26866 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		AA58BFEDD882485E90166190 /* MirrorClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorClient.swift; sourceTree = "<group>"; };
+		EF4831F97D2C4C43A508C8BB /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		8884A4EAD21C4A5589CEC379 /* USBTunnel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBTunnel.swift; sourceTree = "<group>"; };
+		73F9B7B4CE354794AF5AABC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		81A2C7A86C9049749F718537 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2CB1DBD184774F208FF62E7C /* LanViewer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LanViewer-Bridging-Header.h"; sourceTree = "<group>"; };
+		BF8A1D2E5AA34F54A5BF7514 /* USBPorts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USBPorts.h; sourceTree = "<group>"; };
+		33F4A3A96AC54E93A0B58624 /* PTChannel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTChannel.m; sourceTree = "<group>"; };
+		75C077D5080C46098BED1FEA /* PTProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTProtocol.m; sourceTree = "<group>"; };
+		B4A0773B66D445CCB35CA5F3 /* PTUSBHub.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTUSBHub.m; sourceTree = "<group>"; };
+		5FC9B4887D22439781D11DDA /* GCDAsyncSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		DE032EC06B994E51A057F395 /* FKPortForwardingServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FKPortForwardingServer.m; sourceTree = "<group>"; };
+		D3BF75CB07814A97B75928E1 /* PTChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTChannel.h; sourceTree = "<group>"; };
+		02E7A0811CB944A2AF01FB59 /* PTDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTDefines.h; sourceTree = "<group>"; };
+		BB4859557F1047A391D53DDD /* PTPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTPrivate.h; sourceTree = "<group>"; };
+		AE0B1454B7B34FD29DBC8D83 /* PTProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTProtocol.h; sourceTree = "<group>"; };
+		7F41D671D9984890826497DF /* PTUSBHub.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTUSBHub.h; sourceTree = "<group>"; };
+		19DCD9970FDE422BB2C1F6B3 /* Peertalk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Peertalk.h; sourceTree = "<group>"; };
+		14A4C72241AD401D8F4A5EEC /* GCDAsyncSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		1B7C1E2B44EE47B68448CF70 /* FKPortForwardingServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKPortForwardingServer.h; sourceTree = "<group>"; };
+		A2412B485E6D4EA9B0F9CBF8 /* FKPortForwardingCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKPortForwardingCommon.h; sourceTree = "<group>"; };
+		AEE27AC883F54D319AAA080A /* USBPorts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USBPorts.h; sourceTree = "<group>"; };
+		361A621E6C40453095162C70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		4C9C2F3A4DF34A1DB1EF88B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		286BBAFB28FE46BD8A9854B2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		64A3510C40A14C39B3BF8318 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		AE91AA00E8A5487AA47F42B8 /* LanViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LanViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A2D02F920AE47D7A11F1466 /* USBTunnelHost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USBTunnelHost.h; sourceTree = "<group>"; };
+		B49BE32CB7AB40B0B06F77BC /* USBTunnelHost.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = USBTunnelHost.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		157369DACFDB40E38DA1A80C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E3C0038BCCE4773ACD75237 /* Foundation.framework in Frameworks */,
+				26486C8A75AA464DAAD6CEA2 /* UIKit.framework in Frameworks */,
+				EA5585B75A4245A694211FE8 /* CFNetwork.framework in Frameworks */,
+				77E1AB8B51A74972BB4B59F0 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2ECE6ADCF2A440E194CDB9CC = {
+			isa = PBXGroup;
+			children = (
+				34CBCE1941B2432BA0C6223C /* LanViewer */,
+				74D9B1D0B1AF4DA9B07CD18C /* Vendor */,
+				6D429377F1D445E4935F59EC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		34CBCE1941B2432BA0C6223C /* LanViewer */ = {
+			isa = PBXGroup;
+			children = (
+				2B40E3A8DD9D4B9AAEDB2384 /* LanViewerApp.swift */,
+				E6D5C81D0ED940778F73E8A5 /* RootView.swift */,
+				E90891877340444C981B459C /* ConnectView.swift */,
+				4ABA5820378B4093A5C26866 /* PreviewView.swift */,
+				AA58BFEDD882485E90166190 /* MirrorClient.swift */,
+				EF4831F97D2C4C43A508C8BB /* Models.swift */,
+				8884A4EAD21C4A5589CEC379 /* USBTunnel.swift */,
+				73F9B7B4CE354794AF5AABC4 /* Assets.xcassets */,
+				6A2D02F920AE47D7A11F1466 /* USBTunnelHost.h */,
+				B49BE32CB7AB40B0B06F77BC /* USBTunnelHost.m */,
+				81A2C7A86C9049749F718537 /* Info.plist */,
+				2CB1DBD184774F208FF62E7C /* LanViewer-Bridging-Header.h */,
+				BF8A1D2E5AA34F54A5BF7514 /* USBPorts.h */,
+			);
+			path = LanViewer;
+			sourceTree = "<group>";
+		};
+		74D9B1D0B1AF4DA9B07CD18C /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				255EA56DEA224DFD887638AF /* peertalk */,
+				E2D1C08C9341483699F30642 /* CocoaAsyncSocket */,
+				6A4E554875BA40508510B246 /* FKPortForwarding */,
+			);
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		255EA56DEA224DFD887638AF /* peertalk */ = {
+			isa = PBXGroup;
+			children = (
+				33F4A3A96AC54E93A0B58624 /* PTChannel.m */,
+				75C077D5080C46098BED1FEA /* PTProtocol.m */,
+				B4A0773B66D445CCB35CA5F3 /* PTUSBHub.m */,
+				D3BF75CB07814A97B75928E1 /* PTChannel.h */,
+				02E7A0811CB944A2AF01FB59 /* PTDefines.h */,
+				BB4859557F1047A391D53DDD /* PTPrivate.h */,
+				AE0B1454B7B34FD29DBC8D83 /* PTProtocol.h */,
+				7F41D671D9984890826497DF /* PTUSBHub.h */,
+				19DCD9970FDE422BB2C1F6B3 /* Peertalk.h */,
+			);
+			path = peertalk;
+			sourceTree = "<group>";
+		};
+		E2D1C08C9341483699F30642 /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				5FC9B4887D22439781D11DDA /* GCDAsyncSocket.m */,
+				14A4C72241AD401D8F4A5EEC /* GCDAsyncSocket.h */,
+			);
+			path = CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
+		6A4E554875BA40508510B246 /* FKPortForwarding */ = {
+			isa = PBXGroup;
+			children = (
+				DE032EC06B994E51A057F395 /* FKPortForwardingServer.m */,
+				1B7C1E2B44EE47B68448CF70 /* FKPortForwardingServer.h */,
+				A2412B485E6D4EA9B0F9CBF8 /* FKPortForwardingCommon.h */,
+				AEE27AC883F54D319AAA080A /* USBPorts.h */,
+			);
+			path = FKPortForwarding;
+			sourceTree = "<group>";
+		};
+		6D429377F1D445E4935F59EC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AE91AA00E8A5487AA47F42B8 /* LanViewer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B287DAC9C94B44339D733656 /* LanViewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D37604D7D4EB4AB2A54912C4 /* Build configuration list for PBXNativeTarget "LanViewer" */;
+			buildPhases = (
+				0309EC8536BF4D14829E2995 /* Sources */,
+				157369DACFDB40E38DA1A80C /* Frameworks */,
+				231B3BAEC767452592746EC7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LanViewer;
+			productName = LanViewer;
+			productReference = AE91AA00E8A5487AA47F42B8 /* LanViewer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6FB475490CBE4F1A911D2183 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					B287DAC9C94B44339D733656 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 275EF3BA8782479AAD488628 /* Build configuration list for PBXProject "LanViewer" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 2ECE6ADCF2A440E194CDB9CC;
+			productRefGroup = 6D429377F1D445E4935F59EC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B287DAC9C94B44339D733656 /* LanViewer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		231B3BAEC767452592746EC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADEF61EC7AB499AB1E81F2A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0309EC8536BF4D14829E2995 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				06482ABED99D44139B3B9032 /* LanViewerApp.swift in Sources */,
+				723D052AA200420A9000D6B5 /* RootView.swift in Sources */,
+				E6D107B689784A0F87C7872B /* ConnectView.swift in Sources */,
+				6EBFE5022FF946DA933F7D65 /* PreviewView.swift in Sources */,
+				9F9D7DFD24724C498F95DF5F /* MirrorClient.swift in Sources */,
+				7CAAA20B32C042C28269F2C9 /* Models.swift in Sources */,
+				81AD00877D6A4F0C9876FE3E /* USBTunnel.swift in Sources */,
+				9E6542545E3D4016A3F72092 /* USBTunnelHost.m in Sources */,
+				D5733F0DC7B44662ADD73206 /* PTChannel.m in Sources */,
+				E7466D933B4E4D72AC964F7F /* PTProtocol.m in Sources */,
+				091E7B2A12FD4B22BD896485 /* PTUSBHub.m in Sources */,
+				C8A2A708AD2A41EA9D4F90DE /* GCDAsyncSocket.m in Sources */,
+				79BCE77247034E839B9DA675 /* FKPortForwardingServer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6CC24B864FCC416995D90D39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/FKPortForwarding",
+					"$(SRCROOT)/LanViewer",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9CC12D2D274643F28FF2303F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/FKPortForwarding",
+					"$(SRCROOT)/LanViewer",
+				);
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		465F9ED7C2D24528B835282A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LanViewer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "览LAN";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanviewer;
+				PRODUCT_NAME = LanViewer;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "LanViewer/LanViewer-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DBAEA892701C41E081C39ECC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LanViewer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "览LAN";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanviewer;
+				PRODUCT_NAME = LanViewer;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "LanViewer/LanViewer-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		275EF3BA8782479AAD488628 /* Build configuration list for PBXProject "LanViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CC24B864FCC416995D90D39 /* Debug */,
+				9CC12D2D274643F28FF2303F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D37604D7D4EB4AB2A54912C4 /* Build configuration list for PBXNativeTarget "LanViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				465F9ED7C2D24528B835282A /* Debug */,
+				DBAEA892701C41E081C39ECC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6FB475490CBE4F1A911D2183 /* Project object */;
+}
