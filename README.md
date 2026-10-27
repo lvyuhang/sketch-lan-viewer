@@ -12,7 +12,7 @@
 | `research.md` | 技术调研笔记 |
 | `LICENSE-NOTES.md` | 授权说明（上游 LICENSE、Peertalk 等） |
 
-Sketch 插件安装包请用上游 Release 的 `LAN-*.zip`（内含 darwin Node，体积大，不放本仓）。插件侧导出已按 **3x** 改过的说明见 `ios-app/README.zh.md`。
+Sketch 插件安装包在 `dist/LAN-v0.5.3.zip`（约 73MB，内含 darwin Node，克隆后即可双击安装）。插件导出按 **3x**；说明见 `ios-app/README.zh.md`。
 
 ## 快速用法
 

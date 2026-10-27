@@ -7,8 +7,6 @@
 **/*.ipa
 **/*.dSYM/
 
-# Huge release zip with embedded darwin node (download upstream instead)
-dist/*.zip
 dist/**/node
 **/Contents/Resources/node
 **/Contents/Resources/node-*
