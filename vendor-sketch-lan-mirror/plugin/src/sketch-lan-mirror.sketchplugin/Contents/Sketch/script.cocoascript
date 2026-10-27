@@ -537,7 +537,7 @@ function exportAndPost(artboard, opts) {
   var startedAt = Date.now()
 
   var exportStart = Date.now()
-  var results = sketch.export(artboard, { formats: 'png', scales: '3', output: false })
+  var results = sketch.export(artboard, { formats: 'png', scales: '3', output: false })  // meme: 3x 视网膜清晰度
   var exportMs = Date.now() - exportStart
 
   if (!results) {
@@ -835,6 +835,19 @@ function stageBundledNode(pluginRoot) {
 // Node 可执行文件发现：内嵌二进制 → PATH → 常见安装位置 → nvm 版本目录（§十二）
 function findNodeExecutable(pluginRoot) {
   var fm = NSFileManager.defaultManager()
+  // meme hotfix 2026-10-27: Sketch Dock PATH 只有 /usr/bin:/bin；先查已知可跑路径
+  var homeEarly = String(NSHomeDirectory())
+  var forced = [
+    homeEarly + '/.sketch-lan-mirror/node',
+    homeEarly + '/.local/bin/node',
+    homeEarly + '/.volta/bin/node',
+    homeEarly + '/.local/node/bin/node',
+    homeEarly + '/.local/share/fnm/aliases/default/bin/node'
+  ]
+  for (var fi = 0; fi < forced.length; fi++) {
+    if (fm.isExecutableFileAtPath(forced[fi])) return forced[fi]
+    if (fm.fileExistsAtPath(forced[fi])) return forced[fi]
+  }
   if (pluginRoot) {
     var bundled = stageBundledNode(pluginRoot)
     if (bundled) return bundled
