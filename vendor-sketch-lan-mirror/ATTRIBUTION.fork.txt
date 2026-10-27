@@ -1,0 +1,5 @@
+This directory is an unmodified source snapshot of:
+  https://github.com/xuezx1999/sketch-lan-mirror
+  tag/commit: v0.5.3
+Vendor path kept for the sketch-live-preview packaging work for user 宇航.
+See ../LICENSE-NOTES.md — upstream has no LICENSE file as of packaging date.

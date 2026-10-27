@@ -1,0 +1,44 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 10,
+  "name": "📺 览LAN",
+  "identifier": "com.xuezx.sketch-lan-mirror",
+  "version": "0.5.3",
+  "author": "LiminalDrift",
+  "description": "Sketch 画板实时镜像到手机端 —— 局域网无线预览，扫码即看。",
+  "icon": "icon.png",
+  "appcast": "https://github.com/xuezx1999/sketch-lan-mirror/releases/latest/download/appcast.xml",
+  "commands": [
+    {
+      "script": "script.cocoascript",
+      "name": "开启预览 Start LAN",
+      "identifier": "start-mirror",
+      "handler": "onStartLAN"
+    },
+    {
+      "script": "script.cocoascript",
+      "name": "停止预览 Stop LAN",
+      "identifier": "stop-mirror",
+      "handler": "onStopLAN"
+    },
+    {
+      "script": "script.cocoascript",
+      "name": "扫码预览 Open LAN Viewer",
+      "identifier": "open-lan-viewer",
+      "handler": "onOpenLANViewer"
+    }
+  ],
+  "menu": {
+    "title": "📺 览LAN",
+    "items": ["start-mirror", "stop-mirror", "-", "open-lan-viewer"]
+  },
+  "handlers": {
+    "actions": {
+      "SelectionChanged": "onSelectionChanged",
+      "ArtboardChanged": "onArtboardChanged",
+      "TextChanged": "onTextChanged",
+      "LayersMoved": "onLayersMoved",
+      "LayersResized": "onLayersResized"
+    }
+  }
+}
