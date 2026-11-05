@@ -134,11 +134,11 @@
 - (void)ioFrameChannel:(PTChannel*)channel
     didReceiveFrameOfType:(uint32_t)type
                       tag:(uint32_t)tag
-                  payload:(PTData*)payload {
+                  payload:(NSData*)payload {
   // NSLog(@"didReceiveFrameOfType: %u, %u, %@", type, tag, payload);
   if (type == FKPortForwardingFrameTypeWriteToPipe) {
     GCDAsyncSocket* sock = _clientSockets[@(tag)];
-    [sock writeData:[NSData dataWithBytes:payload.data length:payload.length]
+    [sock writeData:payload
         withTimeout:-1
                 tag:0];
     FBPFTrace(@"channel -> socket (%d), %zu bytes", tag, payload.length);
@@ -202,7 +202,7 @@
       (unsigned long)data.length);
   [_peerChannel sendFrameOfType:FKPortForwardingFrameTypeWriteToPipe
                             tag:tag
-                    withPayload:NSDataToGCDData(data)
+                    withPayload:data
                        callback:^(NSError* error) {
                          FBPFTrace(
                              @"socket (%d) -> channel %lu bytes, error = %@",

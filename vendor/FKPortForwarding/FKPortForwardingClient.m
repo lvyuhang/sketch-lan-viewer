@@ -98,7 +98,7 @@ static const NSTimeInterval ReconnectDelay = 1.0;
 - (void)ioFrameChannel:(PTChannel*)channel
     didReceiveFrameOfType:(uint32_t)type
                       tag:(uint32_t)tag
-                  payload:(PTData*)payload {
+                  payload:(NSData*)payload {
   // NSLog(@"received %@, %u, %u, %@", channel, type, tag, payload);
 
   if (type == FKPortForwardingFrameTypeOpenPipe) {
@@ -123,7 +123,7 @@ static const NSTimeInterval ReconnectDelay = 1.0;
 
   if (type == FKPortForwardingFrameTypeWriteToPipe) {
     GCDAsyncSocket* sock = _clientSockets[@(tag)];
-    [sock writeData:[NSData dataWithBytes:payload.data length:payload.length]
+    [sock writeData:payload
         withTimeout:-1
                 tag:0];
     FBPFTrace(@"channel -> socket (%d) %zu bytes", tag, payload.length);
@@ -175,7 +175,7 @@ static const NSTimeInterval ReconnectDelay = 1.0;
   UInt32 tag = [sock.userData unsignedIntValue];
   [_connectedChannel sendFrameOfType:FKPortForwardingFrameTypeWriteToPipe
                                  tag:tag
-                         withPayload:NSDataToGCDData(data)
+                         withPayload:data
                             callback:^(NSError* error) {
                               FBPFTrace(
                                   @"channel -> socket (%d), %lu bytes",
