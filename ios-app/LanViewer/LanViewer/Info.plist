@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh-Hans</string>
 	<key>CFBundleDisplayName</key>
-	<string>览LAN</string>
+	<string>Sketch View</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>览LAN</string>
+	<string>Sketch View</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -47,7 +47,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>览LAN 需要访问同一 Wi-Fi 下的 Mac，才能实时预览 Sketch 画板。</string>
+	<string>Sketch View 需要访问同一 Wi-Fi 下的 Mac，才能实时预览 Sketch 画板。</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_http._tcp</string>

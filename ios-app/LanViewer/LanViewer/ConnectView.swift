@@ -18,7 +18,7 @@ struct ConnectView: View {
             Spacer(minLength: 24)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("览LAN")
+                Text("Sketch View")
                     .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(.white)
 

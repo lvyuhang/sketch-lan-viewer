@@ -305,18 +305,18 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Q8FFGSA9VK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LanViewer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "览LAN";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sketch View";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanviewer;
-				PRODUCT_NAME = LanViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.sketchview;
+				PRODUCT_NAME = "Sketch View";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -334,18 +334,18 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Q8FFGSA9VK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LanViewer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "览LAN";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sketch View";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.meme.lanviewer;
-				PRODUCT_NAME = LanViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meme.sketchview;
+				PRODUCT_NAME = "Sketch View";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
