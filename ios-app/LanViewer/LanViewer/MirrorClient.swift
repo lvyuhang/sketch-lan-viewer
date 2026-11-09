@@ -25,7 +25,7 @@ final class MirrorClient: ObservableObject {
     @Published var currentArtboardId: String?
     @Published var switchingArtboard = false
 
-    private var session: URLSession?
+    private let sessionLife = MirrorSessionLifetime()
     private var webSocket: URLSessionWebSocketTask?
     private var httpBase: URL?
     private var pendingMeta: FrameMeta?
@@ -43,6 +43,8 @@ final class MirrorClient: ObservableObject {
     /// USB /current 连续失败次数；达阈值视为掉线（Sketch 退出后不能继续冻在最后一帧）
     private var consecutiveCurrentFailures = 0
     private let currentFailureLimit = 3
+    /// Generation captured by the active connection's workers.
+    private var activeGeneration: UInt64 = 0
 
     private let defaultsKey = "lan.mirror.serverURL"
     private let transportKey = "lan.mirror.transport"
@@ -87,10 +89,11 @@ final class MirrorClient: ObservableObject {
         // Localhost USB proxy is not a "real" path; waiting hangs forever.
         config.waitsForConnectivity = false
         let session = URLSession(configuration: config, delegate: nil, delegateQueue: nil)
-        self.session = session
+        let generation = sessionLife.adopt(session)
+        activeGeneration = generation
 
         Task { [weak self] in
-            await self?.probeAndOpen(http: pair.http, ws: pair.ws, session: session)
+            await self?.probeAndOpen(http: pair.http, ws: pair.ws, generation: generation)
         }
     }
 
@@ -110,6 +113,8 @@ final class MirrorClient: ObservableObject {
     }
 
     /// Cancel sockets/session without necessarily killing the USB reverse proxy.
+    /// Bumps session generation BEFORE invalidate so sleeping catalog/poll workers
+    /// never call `session.data` on a dead URLSession (uncatchable NSException).
     private func teardownNetworking(intentional: Bool) {
         reconnectTask?.cancel()
         reconnectTask = nil
@@ -122,8 +127,8 @@ final class MirrorClient: ObservableObject {
         receiveLoopRunning = false
         webSocket?.cancel(with: .goingAway, reason: nil)
         webSocket = nil
-        session?.invalidateAndCancel()
-        session = nil
+        sessionLife.teardown()
+        activeGeneration = sessionLife.generation
         _ = intentional
     }
 
@@ -136,7 +141,8 @@ final class MirrorClient: ObservableObject {
     // MARK: - Feature A：同页左右滑
 
     func selectArtboard(id: String) {
-        guard let session, let httpBase else { return }
+        guard sessionLife.session != nil, let httpBase else { return }
+        let generation = activeGeneration
         if id == expectArtboardId { return }
         selectEpoch &+= 1
         let epoch = selectEpoch
@@ -148,7 +154,7 @@ final class MirrorClient: ObservableObject {
         }
         selectTask?.cancel()
         selectTask = Task { [weak self] in
-            await self?.postSelect(id: id, epoch: epoch, using: session, base: httpBase)
+            await self?.postSelect(id: id, epoch: epoch, generation: generation, base: httpBase)
         }
     }
 
@@ -164,7 +170,7 @@ final class MirrorClient: ObservableObject {
 
     // MARK: - Private
 
-    private func probeAndOpen(http: URL, ws: URL, session: URLSession) async {
+    private func probeAndOpen(http: URL, ws: URL, generation: UInt64) async {
         let healthURL = http.appendingPathComponent("health")
         // USB Peertalk needs a moment after mux attaches; retry instead of one-shot fail.
         let attempts = (transport == .usb) ? 8 : 2
@@ -172,14 +178,17 @@ final class MirrorClient: ObservableObject {
         var healthData: Data?
         for i in 0..<attempts {
             if intentionalClose { return }
+            guard let session = liveSession(generation: generation) else { return }
             if transport == .usb {
                 USBTunnel.shared.start()
             }
             do {
                 let (data, response) = try await session.data(from: healthURL)
+                guard liveSession(generation: generation) != nil else { return }
                 guard let httpResp = response as? HTTPURLResponse, httpResp.statusCode == 200 else {
                     lastErrorLocal = nil
                     try? await Task.sleep(nanoseconds: 250_000_000)
+                    guard !Task.isCancelled, liveSession(generation: generation) != nil else { return }
                     continue
                 }
                 if let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -193,6 +202,7 @@ final class MirrorClient: ObservableObject {
                 lastErrorLocal = error
                 let delay: UInt64 = (transport == .usb) ? 300_000_000 : 200_000_000
                 try? await Task.sleep(nanoseconds: delay)
+                guard !Task.isCancelled, liveSession(generation: generation) != nil else { return }
                 _ = i
             }
         }
@@ -203,45 +213,57 @@ final class MirrorClient: ObservableObject {
                 : "连不上 Mac（同 Wi-Fi？防火墙？地址对吗？）")
             return
         }
+        guard liveSession(generation: generation) != nil else { return }
 
-        await fetchCatalog(using: session, base: http)
-        await fetchCurrent(using: session, base: http)
-        startCatalogRefresh(using: session, base: http)
+        await fetchCatalog(generation: generation, base: http)
+        await fetchCurrent(generation: generation, base: http)
+        startCatalogRefresh(generation: generation, base: http)
         // USB Peertalk 上 WebSocket 会秒断，改轮询 /current；Wi‑Fi 仍走 WS
         if transport == .usb {
             state = .online
             reconnectAttempt = 0
-            startHTTPPoll(using: session, base: http)
+            startHTTPPoll(generation: generation, base: http)
         } else {
-            openWebSocket(ws: ws, session: session)
+            guard let session = liveSession(generation: generation) else { return }
+            openWebSocket(ws: ws, session: session, generation: generation)
         }
     }
 
-    private func startHTTPPoll(using session: URLSession, base: URL) {
+    private func liveSession(generation: UInt64) -> URLSession? {
+        sessionLife.liveSession(matching: generation, taskCancelled: Task.isCancelled)
+    }
+
+    private func startHTTPPoll(generation: UInt64, base: URL) {
         pollTask?.cancel()
         pollTask = Task { [weak self] in
             var ticks = 0
             while !Task.isCancelled {
                 guard let self else { return }
                 if self.intentionalClose { return }
+                guard self.liveSession(generation: generation) != nil else { return }
                 ticks += 1
                 // 每 ~2.8s 探 /health：Sketch 退出后 publisherOnline=false 也能秒感知
                 if ticks % 8 == 1 {
-                    await self.probePublisherHealth(using: session, base: base)
+                    await self.probePublisherHealth(generation: generation, base: base)
                     if self.intentionalClose { return }
                     if case .offline = self.state { return }
+                    guard self.liveSession(generation: generation) != nil else { return }
                 }
-                await self.fetchCurrent(using: session, base: base)
+                await self.fetchCurrent(generation: generation, base: base)
                 if case .offline = self.state { return }
                 try? await Task.sleep(nanoseconds: 350_000_000)
+                guard !Task.isCancelled else { return }
+                guard self.liveSession(generation: generation) != nil else { return }
             }
         }
     }
 
-    private func probePublisherHealth(using session: URLSession, base: URL) async {
+    private func probePublisherHealth(generation: UInt64, base: URL) async {
+        guard let session = liveSession(generation: generation) else { return }
         let url = base.appendingPathComponent("health")
         do {
             let (data, response) = try await session.data(from: url)
+            guard liveSession(generation: generation) != nil else { return }
             guard let httpResp = response as? HTTPURLResponse, httpResp.statusCode == 200 else {
                 noteCurrentFailure(reason: "health failed")
                 return
@@ -253,18 +275,24 @@ final class MirrorClient: ObservableObject {
             }
             consecutiveCurrentFailures = 0
         } catch {
+            if Task.isCancelled || liveSession(generation: generation) == nil { return }
             noteCurrentFailure(reason: (error as NSError).localizedDescription)
         }
     }
 
-    private func startCatalogRefresh(using session: URLSession, base: URL) {
+    private func startCatalogRefresh(generation: UInt64, base: URL) {
         catalogTask?.cancel()
         catalogTask = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
                 if self.intentionalClose { return }
                 try? await Task.sleep(nanoseconds: 4_000_000_000)
-                await self.fetchCatalog(using: session, base: base)
+                // Critical: re-check cancel + generation AFTER sleep. The old code
+                // called fetchCatalog with a captured URLSession here and crashed
+                // when teardown had already invalidateAndCancel()'d it.
+                guard !Task.isCancelled else { return }
+                guard self.liveSession(generation: generation) != nil else { return }
+                await self.fetchCatalog(generation: generation, base: base)
             }
         }
     }
@@ -282,10 +310,12 @@ final class MirrorClient: ObservableObject {
         return UIImage(cgImage: cg, scale: scale, orientation: .up)
     }
 
-    private func fetchCurrent(using session: URLSession, base: URL) async {
+    private func fetchCurrent(generation: UInt64, base: URL) async {
+        guard let session = liveSession(generation: generation) else { return }
         let url = base.appendingPathComponent("current")
         do {
             let (data, response) = try await session.data(from: url)
+            guard liveSession(generation: generation) != nil else { return }
             guard let httpResp = response as? HTTPURLResponse else {
                 noteCurrentFailure(reason: "无效响应")
                 return
@@ -309,6 +339,7 @@ final class MirrorClient: ObservableObject {
             consecutiveCurrentFailures = 0
             applyFrame(data: data, response: httpResp)
         } catch {
+            if Task.isCancelled || liveSession(generation: generation) == nil { return }
             noteCurrentFailure(reason: (error as NSError).localizedDescription)
         }
     }
@@ -344,20 +375,24 @@ final class MirrorClient: ObservableObject {
         scheduleReconnect(to: url)
     }
 
-    private func fetchCatalog(using session: URLSession, base: URL) async {
+    private func fetchCatalog(generation: UInt64, base: URL) async {
+        guard let session = liveSession(generation: generation) else { return }
         let url = base.appendingPathComponent("catalog")
         do {
             let (data, response) = try await session.data(from: url)
+            guard liveSession(generation: generation) != nil else { return }
             guard let httpResp = response as? HTTPURLResponse, httpResp.statusCode == 200 else { return }
             if let cat = ArtboardCatalog.parse(from: data) {
                 self.catalog = cat
             }
         } catch {
-            // 目录还没推上来时 404，忽略
+            // 目录还没推上来时 404，忽略；cancelled / invalidated 也忽略
+            _ = error
         }
     }
 
-    private func postSelect(id: String, epoch: UInt64, using session: URLSession, base: URL) async {
+    private func postSelect(id: String, epoch: UInt64, generation: UInt64, base: URL) async {
+        guard let session = liveSession(generation: generation) else { return }
         let url = base.appendingPathComponent("select")
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
@@ -368,6 +403,7 @@ final class MirrorClient: ObservableObject {
         do {
             let (_, response) = try await session.data(for: req)
             guard !Task.isCancelled, epoch == selectEpoch else { return }
+            guard liveSession(generation: generation) != nil else { return }
             guard let httpResp = response as? HTTPURLResponse, httpResp.statusCode == 200 else {
                 if epoch == selectEpoch {
                     switchingArtboard = false
@@ -376,15 +412,17 @@ final class MirrorClient: ObservableObject {
                 return
             }
             // USB：加快等新帧；Wi‑Fi 靠 WS / 补拉。过期 epoch 直接丢弃，不排队。
-            await fetchCurrent(using: session, base: base)
+            await fetchCurrent(generation: generation, base: base)
             guard !Task.isCancelled, epoch == selectEpoch else { return }
             if transport != .usb {
                 try? await Task.sleep(nanoseconds: 200_000_000)
                 guard !Task.isCancelled, epoch == selectEpoch else { return }
-                await fetchCurrent(using: session, base: base)
+                guard liveSession(generation: generation) != nil else { return }
+                await fetchCurrent(generation: generation, base: base)
             }
         } catch {
             if Task.isCancelled || epoch != selectEpoch { return }
+            if liveSession(generation: generation) == nil { return }
             switchingArtboard = false
             expectArtboardId = nil
         }
@@ -399,7 +437,7 @@ final class MirrorClient: ObservableObject {
         let ts = TimeInterval(response.value(forHTTPHeaderField: "x-ts") ?? "")
 
         // Fast-swipe: while waiting for the latest target, drop frames for other ids
-        // so intermediate responses never flash / queue on screen.
+        // so intermediate responses never flash / settle on screen.
         if let expect = expectArtboardId, let headerId, headerId != expect {
             return
         }
@@ -440,26 +478,27 @@ final class MirrorClient: ObservableObject {
         if state != .online { state = .online }
     }
 
-    private func openWebSocket(ws: URL, session: URLSession) {
+    private func openWebSocket(ws: URL, session: URLSession, generation: UInt64) {
         let task = session.webSocketTask(with: ws)
         self.webSocket = task
         receiveLoopRunning = true
         task.resume()
         state = .online
         reconnectAttempt = 0
-        startReceiveLoop(task)
+        startReceiveLoop(task, generation: generation)
     }
 
-    private func startReceiveLoop(_ task: URLSessionWebSocketTask) {
+    private func startReceiveLoop(_ task: URLSessionWebSocketTask, generation: UInt64) {
         Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled, self.receiveLoopRunning, self.webSocket === task {
+                guard self.liveSession(generation: generation) != nil else { return }
                 do {
                     let message = try await task.receive()
                     await self.handle(message)
                 } catch {
                     await MainActor.run {
-                        self.handleSocketFailure(error)
+                        self.handleSocketFailure(error, generation: generation)
                     }
                     break
                 }
@@ -499,16 +538,16 @@ final class MirrorClient: ObservableObject {
         }
     }
 
-    private func handleSocketFailure(_ error: Error) {
+    private func handleSocketFailure(_ error: Error, generation: UInt64) {
         receiveLoopRunning = false
         webSocket = nil
         guard !intentionalClose else { return }
         if transport == .usb {
             // WS 不稳时保持在线，靠 HTTP 轮询
-            if let session, let httpBase {
+            if liveSession(generation: generation) != nil, let httpBase {
                 state = .online
-                startHTTPPoll(using: session, base: httpBase)
-                startCatalogRefresh(using: session, base: httpBase)
+                startHTTPPoll(generation: generation, base: httpBase)
+                startCatalogRefresh(generation: generation, base: httpBase)
             }
             return
         }
