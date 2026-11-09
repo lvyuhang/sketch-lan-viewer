@@ -5,9 +5,8 @@ struct RootView: View {
     @State private var showConnect = true
 
     var body: some View {
+        // No animated Group swap — avoids black blink between connect ↔ preview.
         ZStack {
-            Color.black.ignoresSafeArea()
-
             if showConnect {
                 ConnectView(client: client) {
                     showConnect = false
@@ -20,7 +19,5 @@ struct RootView: View {
                 }
             }
         }
-        .statusBarHidden(true)
-        .persistentSystemOverlays(.hidden)
     }
 }

@@ -1,4 +1,4 @@
-# 览LAN iPhone App + USB 装法（速查）
+# Sketch View（原览LAN iPhone App）+ USB 装法（速查）
 
 工程：`~/Documents/LanViewer-iOS/`
 

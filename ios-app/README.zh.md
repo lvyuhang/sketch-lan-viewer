@@ -1,4 +1,4 @@
-# 览LAN · iPhone 原生预览 App（含 USB）
+# Sketch View · iPhone 原生预览 App（含 USB）
 
 把 Sketch（览LAN 插件）推过来的画板，**全屏、高清（3×）**显示在 iPhone 上。  
 不上架 App Store；用你自己的 Apple ID + Xcode 装到自己手机。
@@ -66,10 +66,10 @@
 桌面还有 `览LAN-iPhone装法.md`；压缩包可在 `~/Downloads/LanViewer-iOS.zip`。
 
 ### 3. Signing
-1. Target **LanViewer** → **Signing & Capabilities**  
+1. Target **LanViewer**（App 显示名 Sketch View） → **Signing & Capabilities**  
 2. 勾 **Automatically manage signing**  
 3. **Team** 选个人账号  
-4. Bundle ID 默认 `com.meme.lanviewer`；冲突就改成 `com.你名字.lanviewer`
+4. Bundle ID 默认 `com.meme.sketchview`；冲突就改成 `com.你名字.lanviewer`
 
 ### 4. 插手机 → Run
 选真机 iPhone → ▶。第一次在手机：**设置 ▸ 通用 ▸ VPN 与设备管理** 里信任开发者。

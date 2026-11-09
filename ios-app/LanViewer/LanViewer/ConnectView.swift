@@ -1,88 +1,60 @@
 import SwiftUI
 
+/// Connect screen — Notion / Linear quiet: typography, hairlines, one accent.
 struct ConnectView: View {
     @ObservedObject var client: MirrorClient
     var onConnected: () -> Void
 
     @State private var serverText: String = ""
-    @State private var mode: ConnectMode = .wifi
+    @State private var mode: ConnectMode = .usb
     @FocusState private var focused: Bool
 
-    enum ConnectMode {
-        case wifi
+    enum ConnectMode: String, CaseIterable, Identifiable {
         case usb
+        case wifi
+        var id: String { rawValue }
+        var title: String {
+            switch self {
+            case .usb: return "USB"
+            case .wifi: return "Wi‑Fi"
+            }
+        }
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer(minLength: 24)
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Sketch View")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(.white)
-
-                Text("把 Sketch 选中的画板全屏扔到手机上。\nMac 上先开「插件 ▸ 览LAN ▸ 开启预览」。")
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color(white: 0.65))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 24)
-
-            Spacer().frame(height: 28)
-
-            modePicker
-                .padding(.horizontal, 24)
-
-            Spacer().frame(height: 20)
-
-            if mode == .wifi {
-                wifiForm
-            } else {
-                usbForm
-            }
-
-            if let err = client.lastError, client.state != .online {
-                Text(err)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(red: 1, green: 0.45, blue: 0.4))
-                    .padding(.horizontal, 24)
-                    .padding(.top, 14)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
-            Spacer()
-
-            VStack(spacing: 12) {
-                statusRow
-
-                Button(action: primaryAction) {
-                    HStack {
-                        if case .connecting = client.state {
-                            ProgressView()
-                                .tint(.black)
-                        }
-                        Text(connectButtonTitle)
-                            .font(.system(size: 17, weight: .semibold))
+            header
+            Divider().overlay(SV.lightHairline)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 28) {
+                    modeRow
+                    detail
+                    if let err = client.lastError, client.state != .online {
+                        Text(err)
+                            .font(.system(size: 13))
+                            .foregroundStyle(SV.bad)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.white)
-                    .foregroundStyle(.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .disabled(isConnectDisabled)
+                .padding(.horizontal, 24)
+                .padding(.top, 28)
+                .padding(.bottom, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 28)
+            .scrollDismissesKeyboard(.interactively)
+
+            Divider().overlay(SV.lightHairline)
+            bottomBar
         }
+        .background(SV.lightBg.ignoresSafeArea())
+        .preferredColorScheme(.light)
         .onAppear {
             if serverText.isEmpty {
                 serverText = client.savedServerURL
             }
             if client.state == .online {
                 onConnected()
+            } else if mode == .usb {
+                connectUSB()
             }
         }
         .onChange(of: client.state) { newValue in
@@ -97,78 +69,170 @@ struct ConnectView: View {
         }
     }
 
-    private var modePicker: some View {
+    // MARK: - Sections
+
+    private var header: some View {
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Sketch View")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(SV.lightText1)
+                Text(heroSubtitle)
+                    .font(.system(size: 13))
+                    .foregroundStyle(SV.lightText2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            statusChip
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 18)
+        .padding(.bottom, 16)
+    }
+
+    private var modeRow: some View {
         HStack(spacing: 0) {
-            modeTab(title: "Wi‑Fi", selected: mode == .wifi) { mode = .wifi }
-            modeTab(title: "USB 线", selected: mode == .usb) { mode = .usb }
+            ForEach(ConnectMode.allCases) { item in
+                Button {
+                    mode = item
+                } label: {
+                    Text(item.title)
+                        .font(.system(size: 13, weight: mode == item ? .semibold : .regular))
+                        .foregroundStyle(mode == item ? SV.lightText1 : SV.lightText2)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(mode == item ? SV.lightSurface : Color.clear)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .stroke(mode == item ? SV.lightHairline : Color.clear, lineWidth: 1)
+                                )
+                        )
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .padding(4)
-        .background(Color(white: 0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(3)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(hex: 0xF0F0F0))
+        )
+        .accessibilityLabel("连接方式")
     }
 
-    private func modeTab(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 15, weight: .semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(selected ? Color.white : Color.clear)
-                .foregroundStyle(selected ? Color.black : Color(white: 0.55))
-                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+    @ViewBuilder
+    private var detail: some View {
+        if mode == .wifi {
+            wifiFields
+        } else {
+            usbHelp
         }
-        .buttonStyle(.plain)
     }
 
-    private var wifiForm: some View {
+    private var wifiFields: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Mac 地址")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color(white: 0.55))
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(SV.lightText2)
 
             TextField("http://192.168.x.x:9777", text: $serverText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
                 .submitLabel(.go)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 14)
-                .background(Color(white: 0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .foregroundStyle(.white)
+                .font(.system(size: 15, design: .monospaced))
+                .foregroundStyle(SV.lightText1)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(SV.lightSurface)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(SV.lightHairline, lineWidth: 1)
+                        )
+                )
                 .focused($focused)
                 .onSubmit { connectWiFi() }
 
-            Text("在 Mac 浏览器打开扫码页也能看到地址：\nhttp://本机IP:9777/qr")
+            Text("也可在 Mac 打开 http://本机IP:9777/qr")
                 .font(.system(size: 12))
-                .foregroundStyle(Color(white: 0.45))
-                .fixedSize(horizontal: false, vertical: true)
+                .foregroundStyle(SV.lightText3)
         }
-        .padding(.horizontal, 24)
     }
 
-    private var usbForm: some View {
+    private var usbHelp: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("USB 连接")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color(white: 0.55))
-
-            Text("1. Mac 上 Sketch 已「开启预览」\n2. Mac 上跑着 LanUSBHelper（USB 助手）\n3. 用数据线插上这台 iPhone（信任电脑）\n4. 点下面「USB 连接」——不用同一 Wi‑Fi")
-                .font(.system(size: 14))
-                .foregroundStyle(Color(white: 0.7))
+            Text("用数据线连接")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(SV.lightText1)
+            Text("插上线，确认 Mac 上 LanUSBHelper 在跑。连上后，Sketch 选中画板即预览；左右滑切换同页画板。")
+                .font(.system(size: 13))
+                .foregroundStyle(SV.lightText2)
                 .fixedSize(horizontal: false, vertical: true)
+                .lineSpacing(3)
+        }
+    }
 
-            Text("原理：手机本地 127.0.0.1:9777 经 Peertalk 反向转到 Mac 览LAN。不是 iproxy，也不用越狱。")
-                .font(.system(size: 12))
-                .foregroundStyle(Color(white: 0.4))
-                .fixedSize(horizontal: false, vertical: true)
+    private var bottomBar: some View {
+        VStack(spacing: 10) {
+            Button(action: primaryAction) {
+                HStack(spacing: 8) {
+                    if case .connecting = client.state {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(.white)
+                    }
+                    Text(connectButtonTitle)
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(isConnectDisabled ? SV.accent.opacity(0.45) : SV.accent)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(isConnectDisabled)
         }
         .padding(.horizontal, 24)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 14)
+        .padding(.bottom, 18)
+        .background(SV.lightBg)
+    }
+
+    private var statusChip: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(statusDot)
+                .frame(width: 6, height: 6)
+            Text(client.state.label)
+                .font(.system(size: 12))
+                .foregroundStyle(SV.lightText2)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .stroke(SV.lightHairline, lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Copy / state
+
+    private var heroSubtitle: String {
+        switch mode {
+        case .usb: return "经 USB 连 Mac 上的览LAN"
+        case .wifi: return "与 Mac 同一 Wi‑Fi"
+        }
     }
 
     private var connectButtonTitle: String {
-        if case .connecting = client.state { return "连接中…" }
+        if case .connecting = client.state { return "正在连接…" }
         return mode == .usb ? "USB 连接" : "连接"
     }
 
@@ -180,33 +244,19 @@ struct ConnectView: View {
         return false
     }
 
-    private var statusRow: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(statusColor)
-                .frame(width: 8, height: 8)
-            Text(client.state.label)
-                .font(.system(size: 13))
-                .foregroundStyle(Color(white: 0.6))
-            Spacer()
+    private var statusDot: Color {
+        switch client.state {
+        case .online: return SV.ok
+        case .connecting: return SV.warn
+        case .offline: return SV.bad
+        case .idle: return SV.lightText3
         }
     }
 
-    private var statusColor: Color {
-        switch client.state {
-        case .online: return Color(red: 0.2, green: 0.78, blue: 0.35)
-        case .connecting: return Color(red: 1, green: 0.8, blue: 0)
-        case .offline: return Color(red: 1, green: 0.27, blue: 0.23)
-        case .idle: return Color(white: 0.4)
-        }
-    }
+    // MARK: - Actions
 
     private func primaryAction() {
-        if mode == .usb {
-            connectUSB()
-        } else {
-            connectWiFi()
-        }
+        if mode == .usb { connectUSB() } else { connectWiFi() }
     }
 
     private func connectWiFi() {
@@ -218,8 +268,7 @@ struct ConnectView: View {
     private func connectUSB() {
         focused = false
         USBTunnel.shared.start()
-        // Give the local proxy a tick to bind before MirrorClient probes /health.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             client.connect(to: USBTunnel.proxyURL, transport: .usb)
         }
     }

@@ -1,6 +1,12 @@
-LAN-v0.5.3.zip
+Sketch-View-v0.6.6.zip  (current runtime — use this)
+- Renamed / forked from sketch-lan-mirror lineage as "Sketch View"
+- Synced from Mac Studio installed plugin 2026-11-09 (local mtime 2026-11-06)
+- Version 0.6.6: Sketch 2026 flush via contentDrawView; event-driven auto-arm; canvas selection clears phone lock
+- Contains embedded darwin Node binary inside the .sketchplugin
+
+LAN-v0.5.3.zip / LAN-v0.5.3-full.zip  (kept for history)
 - Base: upstream sketch-lan-mirror v0.5.3 (embedded darwin Node)
-- Patched 2026-10-27 for meme:
-  - scales: '3'
-  - findNodeExecutable hotfix (Sketch Dock PATH)
-Upstream: https://github.com/xuezx1999/sketch-lan-mirror/releases/tag/v0.5.3
+- Patched 2026-10-27: scales '3' + findNodeExecutable hotfix
+
+Plugin source snapshot (no Node binary): plugin/Sketch View.sketchplugin/
+Upstream origin: https://github.com/xuezx1999/sketch-lan-mirror

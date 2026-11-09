@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B287DAC9C94B44339D733656"
-               BuildableName = "LanViewer.app"
+               BuildableName = "Sketch View.app"
                BlueprintName = "LanViewer"
                ReferencedContainer = "container:LanViewer.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B287DAC9C94B44339D733656"
-            BuildableName = "LanViewer.app"
+            BuildableName = "Sketch View.app"
             BlueprintName = "LanViewer"
             ReferencedContainer = "container:LanViewer.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B287DAC9C94B44339D733656"
-            BuildableName = "LanViewer.app"
+            BuildableName = "Sketch View.app"
             BlueprintName = "LanViewer"
             ReferencedContainer = "container:LanViewer.xcodeproj">
          </BuildableReference>
