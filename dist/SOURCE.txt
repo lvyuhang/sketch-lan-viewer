@@ -1,5 +1,7 @@
-Sketch-View-v0.6.7.zip  (current runtime — use this)
+Sketch-View-v0.6.8.zip  (current runtime — use this; thin overlay)
+Sketch-View-v0.6.7.zip  (first-time install; includes darwin Node)
 Sketch-View-v0.6.6.zip  (previous)
 
+- Version 0.6.8: Tab/file switch follows selection without OpenDocument; force frame + arch stamp; quit+reopen Sketch required
 - Version 0.6.7: After switching Sketch documents, phone follows selection again (delete-suppress no longer eats the second file)
 - Version 0.6.6: Sketch 2026 flush via contentDrawView; event-driven auto-arm; canvas selection clears phone lock
