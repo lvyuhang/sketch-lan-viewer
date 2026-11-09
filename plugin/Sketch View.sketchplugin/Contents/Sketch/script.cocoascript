@@ -6,7 +6,7 @@
  *   Stop LAN            停止 Mirror + 按 PID 精确停止自己启动的 Server
  *   Open LAN Viewer     打开扫码入口页（Mac 浏览器显示 QR，手机扫码进 Viewer）
  *
- * 策略（0.6.6 — docs/FIX-0.6.6.md；自动武装见 FIX-0.6.5；flush/锁见 FIX-0.6.6；架构基底见 ARCHITECTURE-PERF-0.6.md / FIX-0.6.3.md）：
+ * 策略（0.6.7 — docs/FIX-0.6.7.md；自动武装见 FIX-0.6.5；flush/锁见 FIX-0.6.6；跨文档见 FIX-0.6.7；架构基底见 ARCHITECTURE-PERF-0.6.md / FIX-0.6.3.md）：
  *   - 事件驱动 dirty：onDocumentChanged + Selection/Artboard/Text/Move/Resize
  *     + 样式相关 actions（ToggleFill/PasteStyle/…）→ mark dirty + rev++ → debounce → export
  *   - **禁止** Sketch 主线程无 phone 门控的 export setInterval
@@ -19,6 +19,7 @@
  *   - 目标解析：选中画板本身或其内部任意图层均可，parent 链向上归属（ADR-012）
  *   - 导出前做渲染缓存刷新（定时器回调里的 export 可能拿到陈旧渲染，见 ADR-010）
  *   - 删除检测：被删画板触发的自动跳选不推帧，保持手机最后一帧（ADR-011）
+ *   - 跨文档/跨页：切文件或切 Page 后不得把新选中误判为「删除后自动跳选」而抑制推帧
  *   - latest-frame-only：上一帧未发完（sending=true）则本轮直接跳过，不排队
  *   - 不缓存 Artboard 对象：每 tick 从 document/page/selection 重新解析，只记 id
  *
@@ -31,7 +32,7 @@
 var __SLM_SILENT = true  // meme: 自动模式不弹窗
 var SERVER_HOST = '127.0.0.1'
 var SERVER_PORT = 9777
-var ARCH_VERSION = '0.6.6'
+var ARCH_VERSION = '0.6.7'
 var EXPORT_BUDGET_MS = 400          // 单次 export 软预算（观测用）
 var EXPORT_SCALE = '3x'            // 0.6.4: 改动直接推清晰帧，无分档补清
 var PREVIEW_SCALE = EXPORT_SCALE   // 兼容旧引用；与 HIRES 同档
@@ -49,6 +50,7 @@ var SLM = {
   timerId: null,
   phoneTimerId: null,        // meme: 轻量读 phone-select，滑一下别等 1.2s
   currentArtboardId: null,
+  currentDocumentId: null,   // 0.6.7: 跨文档检测；切文件后不得走删除抑制
   currentPageId: null,         // 跨 Page 检测（M3-C 修复：跨 Page 不应被误判为删除）
   suppressedArtboardId: null, // 删除检测：被抑制的自动跳选 Artboard id（ADR-011）
   lockSource: null,          // 'phone' | 'sketch' | null —— 手机滑动锁定优先
@@ -332,8 +334,18 @@ function onDocumentChanged(context) {
 function onOpenDocument(context) {
   try {
     rememberScriptPath(context)
+    // 0.6.7: 打开/切到另一文档时清粘性状态，否则删除抑制会把新文件选中当成「删板跳选」吃掉
+    try {
+      var domOpen = require('sketch/dom')
+      var docOpen = domOpen.getSelectedDocument()
+      var openId = docOpen ? String(docOpen.id) : null
+      if (openId) applyDocumentContext(openId, { forceFrame: true, reason: 'OpenDocument' })
+    } catch (eDoc) {
+      log('[LAN Mirror] OpenDocument context: ' + eDoc)
+    }
     ensureMirrorArmed(context)
-    log('[LAN Mirror] OpenDocument armed running=' + SLM.running + ' arch=' + ARCH_VERSION)
+    if (SLM.running) scheduleFrameCheck()
+    log('[LAN Mirror] OpenDocument armed running=' + SLM.running + ' arch=' + ARCH_VERSION + ' doc=' + SLM.currentDocumentId)
   } catch (e) {
     log('[LAN Mirror] OpenDocument error: ' + e)
   }
@@ -543,6 +555,33 @@ function tryAutoStart(context) {
   }
 }
 
+
+// 0.6.7: 文档上下文切换 — 清手机锁 / 删除抑制 / 粘性画板，避免新文件选中被 ADR-011 误杀
+function applyDocumentContext(documentId, opts) {
+  opts = opts || {}
+  if (!documentId) return false
+  var id = String(documentId)
+  var changed = SLM.currentDocumentId !== null && String(SLM.currentDocumentId) !== id
+  if (changed || opts.forceReset) {
+    log('[LAN Mirror] document context -> ' + id + (opts.reason ? (' (' + opts.reason + ')') : ''))
+    SLM.lockSource = null
+    SLM.suppressedArtboardId = null
+    SLM.currentArtboardId = null
+    SLM.currentPageId = null
+    SLM.lastSentHash = null
+    SLM.lastSentArtboardKey = null
+    SLM.lastCatalogSig = null
+    SLM.dirty = true
+    SLM.rev = (SLM.rev || 0) + 1
+    cancelHiRes()
+  }
+  SLM.currentDocumentId = id
+  if (opts.forceFrame && SLM.running) {
+    SLM.dirty = true
+  }
+  return changed
+}
+
 function onMirrorAction(actionName, context) {
   if (!SLM.running) {
     tryAutoStart(context)
@@ -666,31 +705,48 @@ function runFrameCheck(source) {
       return
     }
 
-    // ── 跨 Page 检测（M3-C 修复：跨 Page 被误判为删除）──────────
-    // 仅当旧画板仍在「当前 Page」上时，下面的删除抑制逻辑才有意义；
-    // 一旦 Page 变了，说明用户在 Sketch 中切到了另一个 Page，必须正常推送新 Page 的当前画板，
-    // 否则会被 artboardExistsOnPage 判为「已删除」而错误抑制推帧。
+    // ── 0.6.7: 跨文档检测（切 .sketch 文件）──────────────────
+    // 旧逻辑只清 suppressedArtboardId，随后仍用「旧 id 不在当前 Page」走删除抑制，
+    // 导致第二个文件的选中永远被当成「删板后的自动跳选」→ 手机只停在第一个文件。
+    if (target.documentId) {
+      applyDocumentContext(target.documentId, { reason: 'frame-check' })
+    }
+
+    // ── 跨 Page 检测（M3-C / 0.6.7）──────────────────────────
+    // Page 变了只更新跟踪并清抑制；是否推送交给下面的「整份文档内是否还在」判断，
+    // 不再用 artboardExistsOnPage（跨页时旧板本就不在新页，会误杀）。
     if (SLM.currentPageId !== null && target.pageId !== SLM.currentPageId) {
-      // meme: 只更新 page 跟踪；不要清空画板 id，否则会反复全量导出
       log('[LAN Mirror] page context -> "' + target.page.name + '"')
       SLM.currentPageId = target.pageId
       SLM.suppressedArtboardId = null
     }
 
     // ── 删除检测（ADR-011，事件/轮询路径都必须保持）───────────
-    // 上一次推送的 Artboard 已从页面消失 → 本次选区是 Sketch 删除后的「自动跳选」，
-    // 抑制该帧不推送，保持手机最后一帧；用户后续手动选中另一个不同 id 的 Artboard 才恢复。
-    if (SLM.currentArtboardId !== null && target.artboardId !== SLM.currentArtboardId) {
-      if (SLM.suppressedArtboardId !== null && target.artboardId === SLM.suppressedArtboardId) {
+    // 仅当「旧画板已从当前文档消失」时，才把新选中视为删除后的自动跳选并抑制。
+    // 旧画板仍在文档其他 Page、或用户已选了与抑制 id 不同的板 → 正常推送。
+    if (SLM.currentArtboardId !== null && String(target.artboardId) !== String(SLM.currentArtboardId)) {
+      if (SLM.suppressedArtboardId !== null && String(target.artboardId) === String(SLM.suppressedArtboardId)) {
         // 仍在被抑制的自动跳选上：继续跳过
         return
       }
-      if (!artboardExistsOnPage(target.page, SLM.currentArtboardId)) {
-        SLM.suppressedArtboardId = target.artboardId
-        log('[LAN Mirror] previous artboard deleted; keeping last phone frame (suppressed "' + target.name + '")')
-        return
+      var sketchRef = null
+      try { sketchRef = require('sketch') } catch (eSk) { sketchRef = null }
+      var oldStillInDoc = false
+      try {
+        oldStillInDoc = !!findArtboardById(target.document || null, SLM.currentArtboardId, sketchRef)
+      } catch (eFind) { oldStillInDoc = false }
+      if (!oldStillInDoc) {
+        if (SLM.suppressedArtboardId === null) {
+          // 首次自动跳选：抑制，保持手机最后一帧
+          SLM.suppressedArtboardId = target.artboardId
+          log('[LAN Mirror] previous artboard deleted; keeping last phone frame (suppressed "' + target.name + '")')
+          return
+        }
+        // 已抑制过自动跳选，用户又点了另一个不同 id → 视为手动恢复
+        log('[LAN Mirror] delete-suppress cleared by new selection "' + target.name + '"')
+        SLM.suppressedArtboardId = null
       }
-    } else if (target.artboardId === SLM.currentArtboardId && SLM.suppressedArtboardId !== null) {
+    } else if (String(target.artboardId) === String(SLM.currentArtboardId) && SLM.suppressedArtboardId !== null) {
       // 回到被跟踪的画板：解除抑制
       SLM.suppressedArtboardId = null
     }
@@ -769,6 +825,7 @@ function runFrameCheck(source) {
       SLM.idleSkips = 0
       SLM.currentArtboardId = r.artboardId
       SLM.currentPageId = target.pageId
+      if (target.documentId) SLM.currentDocumentId = String(target.documentId)
       SLM.lastSendTs = Date.now()
       SLM.lastExportMs = r.exportMs
       SLM.lastPostMs = r.postMs
@@ -836,6 +893,8 @@ function resolveTargetArtboard() {
     if (phoneLocked) {
       return {
         ok: true,
+        document: document,
+        documentId: String(document.id),
         artboard: phoneLocked.artboard,
         artboardId: String(phoneLocked.artboard.id),
         pageId: String(phoneLocked.page.id),
@@ -904,6 +963,8 @@ function resolveTargetArtboard() {
 
   return {
     ok: true,
+    document: document,
+    documentId: String(document.id),
     artboard: chosen,
     artboardId: String(chosen.id),
     pageId: String(page.id),
@@ -1059,15 +1120,19 @@ function consumePhoneSelect() {
 }
 
 function maybeClearPhoneLockFromSketchSelection() {
-  if (SLM.lockSource !== 'phone') return
   try {
     var dom = require('sketch/dom')
     var sketch = require('sketch')
     var document = dom.getSelectedDocument()
     if (!document || !document.selectedPage) return
+    // 0.6.7: 选区已在另一文档 → 无条件丢掉上一文件的手机锁/粘性 id
+    try {
+      applyDocumentContext(String(document.id), { reason: 'selection' })
+    } catch (eCtx) {}
+    if (SLM.lockSource !== 'phone') return
     var layers = []
     try { layers = document.selectedPage.selectedLayers.layers || [] } catch (e) { layers = [] }
-    if (!layers.length) return // 失焦/清空选区：保持手机锁
+    if (!layers.length) return // 失焦/清空选区：保持手机锁（同文档）
     var hit = null
     for (var i = 0; i < layers.length; i++) {
       var ab = findAncestorArtboard(layers[i], sketch)
@@ -1078,6 +1143,8 @@ function maybeClearPhoneLockFromSketchSelection() {
     SLM.lockSource = 'sketch'
     SLM.currentArtboardId = String(hit.id)
     SLM.currentPageId = String(document.selectedPage.id)
+    SLM.currentDocumentId = String(document.id)
+    SLM.suppressedArtboardId = null
     SLM.dirty = true
     log('[LAN Mirror] sketch selection cleared phone lock -> "' + hit.name + '"')
   } catch (e) {

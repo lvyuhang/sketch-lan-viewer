@@ -1,0 +1,58 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 18,
+  "name": "Sketch View",
+  "identifier": "com.xuezx.sketch-lan-mirror",
+  "version": "0.6.7",
+  "author": "LiminalDrift",
+  "description": "Sketch View — 画板实时镜像到手机端。0.6.7：切文档后跟选；修复删除抑制误杀第二文件。",
+  "icon": "icon.png",
+  "appcast": "https://github.com/xuezx1999/sketch-lan-mirror/releases/latest/download/appcast.xml",
+  "commands": [
+    {
+      "script": "script.cocoascript",
+      "name": "自动预览已开启（打开手机即连）",
+      "identifier": "lan-auto-status",
+      "handler": "onShowAutoStatus",
+      "handlers": {
+        "run": "onShowAutoStatus",
+        "onDocumentChanged": "onDocumentChanged"
+      }
+    }
+  ],
+  "menu": {
+    "title": "Sketch View",
+    "items": [
+      "lan-auto-status"
+    ]
+  },
+  "handlers": {
+    "actions": {
+      "Startup": "onStartup",
+      "OpenDocument": "onOpenDocument",
+      "SelectionChanged": "onSelectionChanged",
+      "ArtboardChanged": "onArtboardChanged",
+      "TextChanged": "onTextChanged",
+      "LayersMoved": "onLayersMoved",
+      "LayersResized": "onLayersResized",
+      "ToggleFill": "onStyleAction",
+      "ToggleBorder": "onStyleAction",
+      "AddFill": "onStyleAction",
+      "AddBorder": "onStyleAction",
+      "PasteStyle": "onStyleAction",
+      "ApplySharedLayerStyle": "onStyleAction",
+      "ApplySharedTextStyle": "onStyleAction",
+      "ChangeFont": "onStyleAction",
+      "Duplicate": "onStyleAction",
+      "Delete": "onStyleAction",
+      "Group": "onStyleAction",
+      "Ungroup": "onStyleAction",
+      "Paste": "onStyleAction",
+      "Undo": "onStyleAction",
+      "Redo": "onStyleAction",
+      "Rotate": "onStyleAction",
+      "Scale": "onStyleAction",
+      "Shutdown": "onShutdown"
+    }
+  }
+}

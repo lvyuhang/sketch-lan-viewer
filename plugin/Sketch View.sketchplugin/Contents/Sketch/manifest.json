@@ -1,11 +1,11 @@
 {
   "compatibleVersion": 3,
-  "bundleVersion": 17,
+  "bundleVersion": 18,
   "name": "Sketch View",
   "identifier": "com.xuezx.sketch-lan-mirror",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "author": "LiminalDrift",
-  "description": "Sketch View — 画板实时镜像到手机端。0.6.6：Sketch 2026 flush 走 contentDrawView；任意事件可按画布选区清手机锁。",
+  "description": "Sketch View — 画板实时镜像到手机端。0.6.7：切文档后跟选；修复删除抑制误杀第二文件。",
   "icon": "icon.png",
   "appcast": "https://github.com/xuezx1999/sketch-lan-mirror/releases/latest/download/appcast.xml",
   "commands": [
