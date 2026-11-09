@@ -6,7 +6,7 @@
  *   Stop LAN            停止 Mirror + 按 PID 精确停止自己启动的 Server
  *   Open LAN Viewer     打开扫码入口页（Mac 浏览器显示 QR，手机扫码进 Viewer）
  *
- * 策略（0.6.7 — docs/FIX-0.6.7.md；自动武装见 FIX-0.6.5；flush/锁见 FIX-0.6.6；跨文档见 FIX-0.6.7；架构基底见 ARCHITECTURE-PERF-0.6.md / FIX-0.6.3.md）：
+ * 策略（0.6.8 — docs/FIX-0.6.8.md；0.6.7 见 FIX-0.6.7.md；自动武装见 FIX-0.6.5；flush/锁见 FIX-0.6.6；跨文档见 FIX-0.6.7；架构基底见 ARCHITECTURE-PERF-0.6.md / FIX-0.6.3.md）：
  *   - 事件驱动 dirty：onDocumentChanged + Selection/Artboard/Text/Move/Resize
  *     + 样式相关 actions（ToggleFill/PasteStyle/…）→ mark dirty + rev++ → debounce → export
  *   - **禁止** Sketch 主线程无 phone 门控的 export setInterval
@@ -32,7 +32,7 @@
 var __SLM_SILENT = true  // meme: 自动模式不弹窗
 var SERVER_HOST = '127.0.0.1'
 var SERVER_PORT = 9777
-var ARCH_VERSION = '0.6.7'
+var ARCH_VERSION = '0.6.8'
 var EXPORT_BUDGET_MS = 400          // 单次 export 软预算（观测用）
 var EXPORT_SCALE = '3x'            // 0.6.4: 改动直接推清晰帧，无分档补清
 var PREVIEW_SCALE = EXPORT_SCALE   // 兼容旧引用；与 HIRES 同档
@@ -50,9 +50,11 @@ var SLM = {
   timerId: null,
   phoneTimerId: null,        // meme: 轻量读 phone-select，滑一下别等 1.2s
   currentArtboardId: null,
-  currentDocumentId: null,   // 0.6.7: 跨文档检测；切文件后不得走删除抑制
+  currentDocumentId: null,   // 0.6.7/0.6.8: 跨文档检测；切文件后不得走删除抑制
   currentPageId: null,         // 跨 Page 检测（M3-C 修复：跨 Page 不应被误判为删除）
   suppressedArtboardId: null, // 删除检测：被抑制的自动跳选 Artboard id（ADR-011）
+  forceNextFrame: false,      // 0.6.8: 切文档后强制推帧（跳过 daemon hash 去重）
+  documentChangedAt: 0,       // 0.6.8: 最近一次文档切换 ts（观测）
   lockSource: null,          // 'phone' | 'sketch' | null —— 手机滑动锁定优先
   lastPhoneSelectTs: 0,      // 已处理的 phone-select.json ts
   lastCatalogSig: null,      // 目录签名，变了才 POST /catalog
@@ -345,6 +347,7 @@ function onOpenDocument(context) {
     }
     ensureMirrorArmed(context)
     if (SLM.running) scheduleFrameCheck()
+    writeArchStamp({ reason: 'OpenDocument' })
     log('[LAN Mirror] OpenDocument armed running=' + SLM.running + ' arch=' + ARCH_VERSION + ' doc=' + SLM.currentDocumentId)
   } catch (e) {
     log('[LAN Mirror] OpenDocument error: ' + e)
@@ -354,6 +357,7 @@ function onStartup(context) {
   try {
     rememberScriptPath(context)
     ensureMirrorArmed(context)
+    writeArchStamp({ reason: 'Startup' })
     log('[LAN Mirror] Startup armed running=' + SLM.running + ' arch=' + ARCH_VERSION)
   } catch (e) {
     log('[LAN Mirror] Startup error: ' + e)
@@ -546,6 +550,7 @@ function tryAutoStart(context) {
     SLM.dirty = false
     SLM.idleSkips = 0
     SLM.rev = (SLM.rev || 0) + 1
+    writeArchStamp({ reason: 'auto-start', port: server.port })
     log('[LAN Mirror] auto-started arch=' + ARCH_VERSION + ' port=' + server.port + ' (event-driven + phone-gated stale heartbeat)')
   } catch (e) {
     log('[LAN Mirror] auto-start error: ' + e)
@@ -556,14 +561,16 @@ function tryAutoStart(context) {
 }
 
 
-// 0.6.7: 文档上下文切换 — 清手机锁 / 删除抑制 / 粘性画板，避免新文件选中被 ADR-011 误杀
+// 0.6.7/0.6.8: 文档上下文切换 — 清手机锁 / 删除抑制 / 粘性画板，避免新文件选中被 ADR-011 误杀
+// 0.6.8: 切文档后 forceNextFrame + 写 arch stamp；OpenDocument 在「仅切 tab」时经常不触发，
+// 所以 stale/frame-check 必须自己探 getSelectedDocument().id。
 function applyDocumentContext(documentId, opts) {
   opts = opts || {}
   if (!documentId) return false
   var id = String(documentId)
   var changed = SLM.currentDocumentId !== null && String(SLM.currentDocumentId) !== id
   if (changed || opts.forceReset) {
-    log('[LAN Mirror] document context -> ' + id + (opts.reason ? (' (' + opts.reason + ')') : ''))
+    log('[LAN Mirror] document context -> ' + id + (opts.reason ? (' (' + opts.reason + ')') : '') + ' arch=' + ARCH_VERSION)
     SLM.lockSource = null
     SLM.suppressedArtboardId = null
     SLM.currentArtboardId = null
@@ -572,14 +579,69 @@ function applyDocumentContext(documentId, opts) {
     SLM.lastSentArtboardKey = null
     SLM.lastCatalogSig = null
     SLM.dirty = true
+    SLM.forceNextFrame = true
+    SLM.documentChangedAt = Date.now()
     SLM.rev = (SLM.rev || 0) + 1
     cancelHiRes()
   }
   SLM.currentDocumentId = id
-  if (opts.forceFrame && SLM.running) {
+  if ((opts.forceFrame || changed || opts.forceReset) && SLM.running) {
     SLM.dirty = true
   }
   return changed
+}
+
+// 0.6.8: 纯决策 — 是否把「旧板→新板」当成删板后的自动跳选而抑制。
+// oldStillInDocument 必须按「整份当前文档」查找（不能只查当前 Page）。
+// 跨文档时调用方应先 applyDocumentContext，使 prevArtboardId 被清空，本函数直接放行。
+function shouldSuppressArtboardSwitch(prevArtboardId, nextArtboardId, suppressedArtboardId, oldStillInDocument) {
+  if (prevArtboardId == null || nextArtboardId == null) {
+    return { suppress: false, suppressedArtboardId: suppressedArtboardId, reason: 'no-prev-or-next' }
+  }
+  if (String(nextArtboardId) === String(prevArtboardId)) {
+    return { suppress: false, suppressedArtboardId: null, reason: 'same-artboard' }
+  }
+  if (suppressedArtboardId !== null && String(nextArtboardId) === String(suppressedArtboardId)) {
+    return { suppress: true, suppressedArtboardId: suppressedArtboardId, reason: 'still-suppressed' }
+  }
+  if (!oldStillInDocument) {
+    if (suppressedArtboardId === null) {
+      return { suppress: true, suppressedArtboardId: String(nextArtboardId), reason: 'first-auto-jump-after-delete' }
+    }
+    return { suppress: false, suppressedArtboardId: null, reason: 'manual-after-suppress' }
+  }
+  return { suppress: false, suppressedArtboardId: suppressedArtboardId, reason: 'old-still-in-doc' }
+}
+
+function writeArchStamp(extra) {
+  try {
+    var payload = {
+      arch: ARCH_VERSION,
+      loadedAt: Date.now(),
+      running: !!SLM.running,
+      documentId: SLM.currentDocumentId,
+      artboardId: SLM.currentArtboardId,
+    }
+    if (extra) {
+      for (var k in extra) {
+        if (Object.prototype.hasOwnProperty.call(extra, k)) payload[k] = extra[k]
+      }
+    }
+    var path = String(NSHomeDirectory()) + '/.sketch-lan-mirror/plugin-arch.json'
+    NSString.stringWithString(JSON.stringify(payload)).writeToFile_atomically_encoding_error(path, true, 4, null)
+  } catch (eStamp) {}
+}
+
+// 0.6.8: 不依赖 OpenDocument——切已打开文件的 tab 时常不触发。每轮检查前探一次。
+function probeSelectedDocumentContext(reason) {
+  try {
+    var dom = require('sketch/dom')
+    var doc = dom.getSelectedDocument()
+    if (!doc) return false
+    return applyDocumentContext(String(doc.id), { reason: reason || 'probe' })
+  } catch (eProbe) {
+    return false
+  }
 }
 
 function onMirrorAction(actionName, context) {
@@ -698,6 +760,10 @@ function runFrameCheck(source) {
     eventLatencyMs = Date.now() - SLM_EVENT.lastEventTs // 事件→开始检查（≈debounce 窗口）
   }
   try {
+    // 0.6.8: 先探文档 id（切 tab 不发 OpenDocument）；必须在 resolve / 删除抑制之前
+    var docChangedEarly = false
+    try { docChangedEarly = !!probeSelectedDocumentContext('pre-resolve') } catch (ePre) {}
+
     var target = resolveTargetArtboard()
     if (!target.ok) {
       // 没有文档 / 没有选中 Artboard / Artboard 被删：保留手机最后一帧，只记日志
@@ -705,11 +771,16 @@ function runFrameCheck(source) {
       return
     }
 
-    // ── 0.6.7: 跨文档检测（切 .sketch 文件）──────────────────
+    // ── 0.6.7/0.6.8: 跨文档检测（切 .sketch 文件）────────────
     // 旧逻辑只清 suppressedArtboardId，随后仍用「旧 id 不在当前 Page」走删除抑制，
     // 导致第二个文件的选中永远被当成「删板后的自动跳选」→ 手机只停在第一个文件。
+    var docChanged = docChangedEarly
     if (target.documentId) {
-      applyDocumentContext(target.documentId, { reason: 'frame-check' })
+      if (applyDocumentContext(target.documentId, { reason: 'frame-check' })) docChanged = true
+    }
+    if (docChanged) {
+      // 切文件后立刻刷新 catalog，避免手机仍划旧文件的画板列表
+      try { maybePostCatalog(true) } catch (eCat) {}
     }
 
     // ── 跨 Page 检测（M3-C / 0.6.7）──────────────────────────
@@ -721,40 +792,38 @@ function runFrameCheck(source) {
       SLM.suppressedArtboardId = null
     }
 
-    // ── 删除检测（ADR-011，事件/轮询路径都必须保持）───────────
+    // ── 删除检测（ADR-011；0.6.8 走纯函数 shouldSuppressArtboardSwitch）──
     // 仅当「旧画板已从当前文档消失」时，才把新选中视为删除后的自动跳选并抑制。
-    // 旧画板仍在文档其他 Page、或用户已选了与抑制 id 不同的板 → 正常推送。
+    // 跨文档时 applyDocumentContext 已清空 currentArtboardId，这里不会误杀。
     if (SLM.currentArtboardId !== null && String(target.artboardId) !== String(SLM.currentArtboardId)) {
-      if (SLM.suppressedArtboardId !== null && String(target.artboardId) === String(SLM.suppressedArtboardId)) {
-        // 仍在被抑制的自动跳选上：继续跳过
-        return
-      }
       var sketchRef = null
       try { sketchRef = require('sketch') } catch (eSk) { sketchRef = null }
       var oldStillInDoc = false
       try {
         oldStillInDoc = !!findArtboardById(target.document || null, SLM.currentArtboardId, sketchRef)
       } catch (eFind) { oldStillInDoc = false }
-      if (!oldStillInDoc) {
-        if (SLM.suppressedArtboardId === null) {
-          // 首次自动跳选：抑制，保持手机最后一帧
-          SLM.suppressedArtboardId = target.artboardId
+      var decision = shouldSuppressArtboardSwitch(
+        SLM.currentArtboardId, target.artboardId, SLM.suppressedArtboardId, oldStillInDoc)
+      SLM.suppressedArtboardId = decision.suppressedArtboardId
+      if (decision.suppress) {
+        if (decision.reason === 'first-auto-jump-after-delete') {
           log('[LAN Mirror] previous artboard deleted; keeping last phone frame (suppressed "' + target.name + '")')
-          return
         }
-        // 已抑制过自动跳选，用户又点了另一个不同 id → 视为手动恢复
+        return
+      }
+      if (decision.reason === 'manual-after-suppress') {
         log('[LAN Mirror] delete-suppress cleared by new selection "' + target.name + '"')
-        SLM.suppressedArtboardId = null
       }
     } else if (String(target.artboardId) === String(SLM.currentArtboardId) && SLM.suppressedArtboardId !== null) {
       // 回到被跟踪的画板：解除抑制
       SLM.suppressedArtboardId = null
     }
 
-    var switched = SLM.currentArtboardId !== null && String(SLM.currentArtboardId) !== String(target.artboardId)
+    var switched = docChanged || (SLM.currentArtboardId !== null && String(SLM.currentArtboardId) !== String(target.artboardId))
     if (switched) {
       SLM.dirty = true
-      log('[LAN Mirror] artboard switched -> "' + target.artboard.name + '", sending immediately')
+      if (docChanged) SLM.forceNextFrame = true
+      log('[LAN Mirror] artboard switched -> "' + target.artboard.name + '"' + (docChanged ? ' [doc]' : '') + ', sending immediately')
     }
 
     // 0.6: poll 路径不应再进来；若误入且不脏则立即返回（不做 resolve 已在上面付出代价）
@@ -786,7 +855,7 @@ function runFrameCheck(source) {
     // 定时器/事件回调里的 export 会拿到陈旧渲染缓存（ADR-010），先做无损刷新
     // 0.6.3: flush 失败 → 带 x-force-frame，daemon 跳过去重；仍 skipped/失败则保持 dirty 再试
     var flush = forceRenderFlush()
-    var forceFrame = !flush.ok
+    var forceFrame = !flush.ok || !!SLM.forceNextFrame || !!docChanged
 
     var r = exportAndPost(target.artboard, {
       skipIfUnchanged: true,
@@ -823,9 +892,11 @@ function runFrameCheck(source) {
     if (r.ok) {
       SLM.dirty = false
       SLM.idleSkips = 0
+      SLM.forceNextFrame = false
       SLM.currentArtboardId = r.artboardId
       SLM.currentPageId = target.pageId
       if (target.documentId) SLM.currentDocumentId = String(target.documentId)
+      writeArchStamp({ lastFrame: String(r.artboardId), source: source })
       SLM.lastSendTs = Date.now()
       SLM.lastExportMs = r.exportMs
       SLM.lastPostMs = r.postMs
@@ -1042,6 +1113,13 @@ function staleHeartbeatTick() {
   }
   // 已有 debounce / 正在发送：轻量跳过，不堆叠
   if (SLM.sending || SLM_EVENT.debounceTimerId !== null) return
+  // 0.6.8: 切 tab 不发 OpenDocument/SelectionChanged 时，靠心跳发现文档切换
+  try {
+    if (probeSelectedDocumentContext('stale-probe')) {
+      SLM.dirty = true
+      SLM.forceNextFrame = true
+    }
+  } catch (eStaleDoc) {}
   // 软 mark：dirty=true 但不 rev++；漏事件时 export 仍能抓到新像素
   SLM.dirty = true
   runFrameCheck('stale')
